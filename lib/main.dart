@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:saapl/models/work_model.dart';
+import 'package:saapl/pages/edit_work_order_screen.dart';
+import 'package:saapl/pages/login_screen.dart';
 import 'package:saapl/pages/pages.dart';
 
 import 'colors.dart';
 
 void main() {
-  SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  // SystemChrome.setSystemUIOverlayStyle(
+  //     const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   runApp(const MyApp());
 }
 
@@ -19,6 +21,6 @@ class MyApp extends StatelessWidget {
         title: 'Saapl',
         debugShowCheckedModeBanner: false,
         theme: MyTheme.lightTheme(context),
-        home: const LoginScreen());
+        home: SplashScreen());
   }
 }

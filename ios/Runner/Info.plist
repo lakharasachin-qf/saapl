@@ -39,7 +39,24 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow access to photo library</string>
+
+    <key>NSCameraUsageDescription</key>
+    <string>Allow access to camera to capture photos</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow access to microphone</string>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+
+	 <key>NSLocationAlwaysUsageDescription</key>
+        <string>Needed to access location</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>Needed to access location</string>
 	<false/>
 </dict>
 </plist>

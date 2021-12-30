@@ -5,21 +5,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class MyTheme {
+  //https://material.io/design/color/the-color-system.html#tools-for-picking-colors
   static Map<int, Color> color = {
-    50: Color.fromRGBO(136, 14, 79, .1),
-    100: Color.fromRGBO(136, 14, 79, .2),
-    200: Color.fromRGBO(136, 14, 79, .3),
-    300: Color.fromRGBO(136, 14, 79, .4),
-    400: Color.fromRGBO(136, 14, 79, .5),
-    500: Color.fromRGBO(136, 14, 79, .6),
-    600: Color.fromRGBO(136, 14, 79, .7),
-    700: Color.fromRGBO(136, 14, 79, .8),
-    800: Color.fromRGBO(136, 14, 79, .9),
-    900: Color.fromRGBO(136, 14, 79, 1),
+    50: Color.fromRGBO(55, 108, 177, .1),
+    100: Color.fromRGBO(55, 108, 177, .2),
+    200: Color.fromRGBO(55, 108, 177, .3),
+    300: Color.fromRGBO(55, 108, 177, .4),
+    400: Color.fromRGBO(55, 108, 177, .5),
+    500: Color.fromRGBO(55, 108, 177, .6),
+    600: Color.fromRGBO(55, 108, 177, .7),
+    700: Color.fromRGBO(55, 108, 177, .8),
+    800: Color.fromRGBO(55, 108, 177, .9),
+    900: Color.fromRGBO(55, 108, 177, 1),
   };
 
   static ThemeData lightTheme(BuildContext context) => ThemeData(
-      primarySwatch: MaterialColor(0xff8b0934, color),
+      primarySwatch: MaterialColor(0xff376CB1, color),
       primaryColor: primaryColor,
       fontFamily: "proxi",
       cardColor: Colors.white,
@@ -46,8 +47,8 @@ class MyTheme {
 }
 
 //Colors
-const Color primaryColor = Color(0xff8b0934);
-const Color secondaryColor = Color(0xfffaa921);
+const Color primaryColor = Color(0xff376CB1);
+const Color secondaryColor = Color(0xffDC853D);
 const Color darkBluishColor = Color(0xff403b58);
 const Color whiteBackground = Color(0xFFF0F0F0);
 const Color shadowColor = Color(0xE8F3F3F3);
