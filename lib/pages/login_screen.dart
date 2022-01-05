@@ -47,13 +47,13 @@ class _LoginScreenState extends State<LoginScreen> {
               'assets/bg_login_top_p.png',
               alignment: Alignment.centerRight,
               fit: BoxFit.cover,
-              height: 320,
+              height: 300,
             ),
             top: -20,
             left: -25,
           ),
           Positioned(
-            top: 150,
+            top: getHeight(context)/4,
             left: 30,
             child: Column(
               children: [
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        top: 50, bottom: 0, right: 30, left: 30),
+                        top: 1, bottom: 0, right: 30, left: 30),
                     child: Form(
                       key: _formKey,
                       child: Column(

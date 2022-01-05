@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:saapl/models/login_model.dart';
@@ -30,7 +33,6 @@ class CustomAppBar extends StatefulWidget with PreferredSizeWidget {
   makeApiCall() {
     state.attendanceApi();
     state.initSharedPref();
-
   }
 }
 
@@ -59,8 +61,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
     user = Data.fromJson(jsondatais);
     String? lastEntryStatus = pref.getString("isInOut");
     String? previousEntryDate = pref.getString("entryDate");
-   // print("app bar "+lastEntryStatus.toString());
-   // print("app bar "+previousEntryDate.toString());
+    // print("app bar "+lastEntryStatus.toString());
+    // print("app bar "+previousEntryDate.toString());
 
     if (jsondatais.isNotEmpty) {
       setState(() {
@@ -90,7 +92,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               // flagSubmittingToApi = "N";
               currentIconAsset = inIcon;
               flagSubmittingToApi = "I";
-            }else if (lastEntryStatus == "N") {
+            } else if (lastEntryStatus == "N") {
               currentIconAsset = "";
               flagSubmittingToApi = "O";
             }
@@ -237,7 +239,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     String? location = pref.getString('location');
     if (location != null && location.isNotEmpty && location != "null") {
       print(location.toString() + "Make api call");
-      widget.callback("apiStart");
+      //widget.callback("apiStart");
       Map<String, dynamic> map = {
         'empId': empId.toString(),
         'inout': flagSubmittingToApi,
@@ -249,7 +251,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       final response = await http.post(Uri.parse(api_in_out_data), body: map);
       if (response.statusCode == 200) {
         var resBody = json.decode(response.body);
-        widget.callback("apiEndS");
+        //widget.callback("apiEndS");
         await pref.remove("location");
         var now = DateTime.now();
         var formatter = DateFormat('yyyy-MM-dd');
@@ -257,23 +259,128 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
         await pref.setString("entryDate", formattedDate);
         await pref.setString("isInOut", flagSubmittingToApi);
-        if(flagSubmittingToApi == "O"){
+        if (flagSubmittingToApi == "O") {
           //await pref.setString("isInOut", "N");
         }
-
+        _showToast("Attendance added");
         // makeInOutOPR();
         //initSharedPref();
         print(resBody);
       } else {
         await pref.remove("location");
-        widget.callback("apiEnd");
+        //     widget.callback("apiEnd");
         print("Error");
       }
     } else {
-      widget.callback("getLocation");
+      eventToGetLocation();
+      //widget.callback("getLocation");
     }
   }
 
 // if icon == IN then make entry of In and then replace icon with out
 
+  String location = 'Null, Press Button';
+  String Address = 'search';
+
+  Future<Position> _getGeoLocationPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+
+      await Geolocator.openLocationSettings();
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  Future<void> GetAddressFromLatLong(Position position) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    print(placemarks);
+    Placemark place = placemarks[0];
+    Address =
+        '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    pref = await SharedPreferences.getInstance();
+
+    await pref.setString("location", Address);
+
+    print("Address = " + Address);
+    attendanceApi();
+  }
+
+  eventToGetLocation() async {
+     _showToast("fetching location...");
+
+    Position position = await _getGeoLocationPosition();
+    location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
+    print("Location = " + location);
+    GetAddressFromLatLong(position);
+  }
+
+  late FToast fToast;
+
+  _showToast(String msg) {
+    fToast = FToast();
+    fToast.init(context);
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: secondaryColor,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: Colors.white,
+          ),
+          SizedBox(
+            width: 10.0,
+          ),
+          Text(
+            msg,
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 1),
+    );
+  }
 }

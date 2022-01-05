@@ -39,12 +39,12 @@ class _QWTScreenState extends State<QWTScreen> {
     super.initState();
     fToast = FToast();
     fToast.init(context);
+    initSharedPref();
 
     getOEMApiCall(LoadingOem, api_oem_list);
     getPartyApiCall(LoadingParty, api_party_list);
     getEmployeeList(LoadingEmployee, api_employee_list);
     getVisitTypeApiCall(LoadingVisitType, api_visit_type_list);
-    initSharedPref();
   }
 
   late SharedPreferences pref;
@@ -371,16 +371,16 @@ class _QWTScreenState extends State<QWTScreen> {
                             });
 
                             screenshotController
-                                .capture(delay: Duration(milliseconds: 10))
+                                .capture(delay: const Duration(milliseconds: 10))
                                 .then((capturedImage) async {
-                              // showing the captured widget
-                              // through ShowCapturedWidget
-                              saveImage(capturedImage);
+                                await saveImage(capturedImage);
+                                addQWTApi();
+
                             }).catchError((onError) {
                               print(onError);
+                              addQWTApi();
                             });
 
-                            addQWTApi();
                             // use the email provided here
                           }
                         },
@@ -506,32 +506,46 @@ class _QWTScreenState extends State<QWTScreen> {
     String selectedOEMId = "0";
     String selectedPartyId = "0";
     String selectedEmployeeId = "0";
-    oemDataList.map((item) {
-      if (item["MACHCOMP"] == selectedOEM) {
-        selectedOEMId = item["MACHCOMPID"];
-      }
-    });
-    partyDataList.map((item) {
-      if (item["PNAME"] == selectedParty) {
-        selectedPartyId = item["PRTYID"];
-      }
-    });
-    employeeDataList.map((item) {
-      if (item["ENAME"] == selectedEmployee) {
-        selectedEmployeeId = item["EMPID"];
-      }
-    });
+    String selectedVisitId = "";
 
+    print("selectedOEM " +selectedOEM);
+    print("selectedParty " +selectedParty);
+    print("selectedEmployee " +selectedEmployee);
+
+    for(int i =0;i<oemDataList.length;i++){
+      if (oemDataList[i]["MACHCOMP"].toString().trim() == selectedOEM) {
+        selectedOEMId = oemDataList[i]["MACHCOMPID"].toString();
+      }
+    }
+
+    for(int i =0;i<partyDataList.length;i++){
+      if (partyDataList[i]["PNAME"].toString().trim() == selectedParty) {
+        selectedPartyId = partyDataList[i]["PRTYID"].toString();
+      }
+    }
+
+    for(int i =0;i<employeeDataList.length;i++){
+      if (employeeDataList[i]["ENAME"].toString().trim() == selectedEmployee) {
+        selectedEmployeeId = employeeDataList[i]["EMPID"].toString();
+      }
+    }
+    for(int i =0;i<visitType.length;i++){
+      if (visitType[i]["name"].toString().trim() == selectedVisitType) {
+        selectedVisitId = visitType[i]["type"].toString();
+      }
+    }
+    //{oemId: 15, partyId: 38, empId: 133, visitType: I, woNo: re frrr, enterBy: 0051, remark: rr}
+//{oemId: 29, partyId: 19, empId: 69, visitType: WIRING, woNo: fggg, enterBy: 0051, remark: ggggggg}
     Map<String, dynamic> map = {
       'oemId': selectedOEMId,
       'partyId': selectedPartyId,
       'empId': selectedEmployeeId,
-      'visitType': selectedVisitType,
+      'visitType': selectedVisitId,
       'woNo': woNoController.text,
-      'enterBy': userName,
+      'enterBy': userName.trim(),
       'remark': remarkController.text
     };
-
+    print("PostPARAM " +map.toString());
     final response = await http.post(Uri.parse(api_add_qwt), body: map);
     if (response.statusCode == 200) {
       var resBody = json.decode(response.body);
