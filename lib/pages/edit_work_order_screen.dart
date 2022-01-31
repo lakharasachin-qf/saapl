@@ -10,14 +10,13 @@ import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:saapl/models/call_details_model.dart';
 import 'package:saapl/models/work_model.dart';
 import 'package:saapl/utils/apis_collection.dart';
 import 'package:saapl/utils/screen_loader.dart';
-import 'dart:io' as Io;
-import 'package:intl/intl.dart';
 
 import '../colors.dart';
 
@@ -74,9 +73,14 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
       detailsObject = CallDetailsModel.fromJson(json.decode(response.body));
       print("response " + (jsonEncode(detailsObject)));
       partyNameController.text = detailsObject.PARTYID[0].PNAME;
-      oemController.text = detailsObject.WORKORDERID[0].OEM.isNotEmpty
-          ? ' '
-          : detailsObject.WORKORDERID[0].OEM;
+      // oemController.text = detailsObject.WORKORDERID[0].OEM.isNotEmpty
+      //     ? ' '
+      //     : detailsObject.WORKORDERID[0].OEM;
+
+      oemController.text =
+          detailsObject.OEM.isEmpty ? ' ' : detailsObject.OEM.trim();
+      print("detailsObject.OEM " + (detailsObject.OEM));
+      // oemController.text ="Sach";
       complainController.text = detailsObject.COMPLAIN;
 
       if (detailsObject.ISCHARGABLE == 1) {
@@ -157,16 +161,16 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                         setState(() {});
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     TextFormField(
                       enabled: false,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "OEM",
                       ),
                       controller: oemController,
-                      style: TextStyle(fontSize: 18, fontFamily: "proxi"),
+                      style: const TextStyle(fontSize: 18, fontFamily: "proxi"),
                       cursorColor: primaryColor,
                       onChanged: (value) {
                         setState(() {});
@@ -177,17 +181,17 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                     ),
                     TextFormField(
                       enabled: false,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Complain",
                       ),
                       controller: complainController,
-                      style: TextStyle(fontSize: 18, fontFamily: "proxi"),
+                      style: const TextStyle(fontSize: 18, fontFamily: "proxi"),
                       cursorColor: primaryColor,
                       onChanged: (value) {
                         setState(() {});
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     TextFormField(
@@ -197,17 +201,17 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                         }
                         return null;
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Action",
                       ),
                       controller: actionTakenController,
-                      style: TextStyle(fontSize: 18, fontFamily: "proxi"),
+                      style: const TextStyle(fontSize: 18, fontFamily: "proxi"),
                       cursorColor: primaryColor,
                       onChanged: (value) {
                         setState(() {});
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     const Text(
@@ -242,11 +246,11 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                     TextFormField(
                       textInputAction: TextInputAction.next,
                       enabled: amoutEnable,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Amount",
                       ),
                       controller: amountController,
-                      style: TextStyle(fontSize: 18, fontFamily: "proxi"),
+                      style: const TextStyle(fontSize: 18, fontFamily: "proxi"),
                       keyboardType: TextInputType.number,
                       inputFormatters: [DecimalTextInputFormatter()],
                       cursorColor: primaryColor,
@@ -254,16 +258,16 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                         setState(() {});
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     TextFormField(
                       enabled: recAmoutEnable,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Receive Amount",
                       ),
                       controller: recAmountController,
-                      style: TextStyle(fontSize: 18, fontFamily: "proxi"),
+                      style: const TextStyle(fontSize: 18, fontFamily: "proxi"),
                       inputFormatters: [DecimalTextInputFormatter()],
                       keyboardType: TextInputType.number,
                       cursorColor: primaryColor,
@@ -275,7 +279,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                         FocusScope.of(context).unfocus();
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     TextFormField(
@@ -311,7 +315,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                                   });
                                 },
                               ),
-                              Text(
+                              const Text(
                                 'Ticket close',
                                 style: TextStyle(
                                     fontSize: 17.0, color: Colors.black),
@@ -338,11 +342,11 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.attach_file,
                                     color: Colors.white,
                                   ),
-                                  Text(
+                                  const Text(
                                     "Upload File",
                                     style: TextStyle(
                                         fontFamily: "proxi",
@@ -365,11 +369,11 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                             },
                             color: secondaryColor,
                             textColor: Colors.white,
-                            padding: EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                                 left: 12, right: 12, top: 12, bottom: 12),
                           )
                         : Container(),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Row(
@@ -385,7 +389,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                       ],
                     ),
 
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     RaisedButton(
@@ -394,7 +398,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                         width: getWidth(context),
                         child: Text(
                           btnText,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontFamily: "proxi",
                               fontSize: 18,
                               fontWeight: FontWeight.bold),
@@ -416,10 +420,10 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                       },
                       color: secondaryColor,
                       textColor: Colors.white,
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           left: 15, right: 15, top: 18, bottom: 18),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 50,
                     ),
                   ],
@@ -432,28 +436,18 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     ]);
   }
 
-  int _radioValue2 = -1;
-  int _radioValue3 = -1;
-  int _radioValue4 = -1;
-  int _radioValue5 = -1;
-
-  int _radioValue1 = -1;
   int _radioValue = -1;
 
   String selectedOption = "N";
 
   void _handleRadioValueChange(int? value) {
     setState(() {
-      //_radioValue = value!;
-
       switch (value!) {
         case 0:
-          this.selectedOption = "Y";
-
+          selectedOption = "Y";
           break;
         case 1:
-          this.selectedOption = "N";
-
+          selectedOption = "N";
           break;
       }
     });
@@ -470,7 +464,8 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     var formattedDate = formatter.parse(detailsObject.TICKETDATE);
 
     //detailsObject.TICKETDATE
-  print("DAAAA = "+formatter.format(formatter.parse(detailsObject.TICKETDATE)).toString());
+    print("DAAAA = " +
+        formatter.format(formatter.parse(detailsObject.TICKETDATE)).toString());
     var _CompanyName = (detailsObject.COMPNAME.isNotEmpty)
         ? detailsObject.COMPNAME
         : 'Not Filled';
@@ -508,7 +503,9 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     var _AnalysisBy = (detailsObject.CALLDETAILS.ENAME.isNotEmpty)
         ? detailsObject.CALLDETAILS.ENAME
         : 'Not Filled';
-    var _AnalysisDate = (detailsObject.TICKETDATE.isNotEmpty) ? formatter.format(formatter.parse(detailsObject.TICKETDATE)) : 'Not Filled';
+    var _AnalysisDate = (detailsObject.TICKETDATE.isNotEmpty)
+        ? formatter.format(formatter.parse(detailsObject.TICKETDATE))
+        : 'Not Filled';
     var _AnalysisDetails = (detailsObject.COMPLAIN.isNotEmpty)
         ? detailsObject.COMPLAIN
         : 'Not Filled';
@@ -558,7 +555,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
         _AnalysisBy +
         "</td> </tr>" +
         "<tr> <td style='font-size: 12px; vertical-align: baseline;'>Analysis Date</td> <td style='font-size: 12px; vertical-align: baseline;'>: " +
-        _AnalysisDate+
+        _AnalysisDate +
         "</td> </tr>" +
         "<tr > <td style='font-size: 12px; vertical-align: baseline;'>Analysis Details</td> <td rowspan='12' valign='top' style='font-size: 12px; vertical-align: baseline;'>: " +
         _AnalysisDetails +
@@ -628,7 +625,8 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
       final File file = File(generatedPdfFilePath);
       Uint8List data = file.readAsBytesSync(); //Uint8List.fromList(sheets);
       MimeType type = MimeType.PDF;
-      String path = await FileSaver.instance.saveAs("report", data, "pdf", type);
+      String path =
+          await FileSaver.instance.saveAs("report", data, "pdf", type);
       generatedReportPDF = file;
       print(path);
       print(file.path);
@@ -641,7 +639,9 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
       print(e);
     }
   }
-  String pdfBASE64="";
+
+  String pdfBASE64 = "";
+
   Future<String> _setPath() async {
     Directory _path = await getApplicationDocumentsDirectory();
     String _localPath = _path.path + Platform.pathSeparator + 'Download';
@@ -697,14 +697,16 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     print(request.fields);
     if (documentUploadExt == 'pdf') {
       print("uploading pdf");
-      request.files.add(await http.MultipartFile.fromPath('uploads', generatedReportPDF.path));
+      request.files.add(await http.MultipartFile.fromPath(
+          'uploads', generatedReportPDF.path));
     } else {
       print("uploading image");
 
       Uint8List imagebytes = await _image.readAsBytes(); //convert to bytes
-      String base64string = base64.encode(imagebytes); //convert bytes to base64 strin
+      String base64string =
+          base64.encode(imagebytes); //convert bytes to base64 strin
       print(base64string);
-      request.fields['uploads'] = "data:image/jpeg;base64,"+base64string;
+      request.fields['uploads'] = "data:image/jpeg;base64," + base64string;
     }
 
     var res = await request.send();
@@ -730,16 +732,16 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
           Text(
             msg,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
@@ -748,7 +750,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     fToast.showToast(
       child: toast,
       gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 2),
+      toastDuration: const Duration(seconds: 2),
     );
   }
 
@@ -782,17 +784,25 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                   //
                   //       Navigator.of(context).pop();
                   //     }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Open Camera'),
+                  ListTile(
+                    leading: const Icon(Icons.photo_camera),
+                    title: const Text('Open Camera'),
                     onTap: () {
                       chooseImage();
                       Navigator.of(context).pop();
                     },
                   ),
-                  new ListTile(
-                    leading: new Icon(Icons.cancel),
-                    title: new Text(
+                  ListTile(
+                    leading: const Icon(Icons.photo_camera),
+                    title: const Text('Select Gallery'),
+                    onTap: () {
+                      selectFromGalleryImage();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.cancel),
+                    title: const Text(
                       'Cancel',
                       style: TextStyle(color: primaryColor),
                     ),
@@ -813,23 +823,35 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   Future<void> chooseImage() async {
     final ImagePicker _picker = ImagePicker();
     var choosedimage = await _picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      uploadimage = choosedimage;
-      documentUploadExt = "jpeg";
+    if (choosedimage != null) {
+      setState(() {
+        uploadimage = choosedimage;
+        documentUploadExt = "jpeg";
+        _image = File(choosedimage.path);
+      });
+    }
+  }
 
-      _image = File(choosedimage!.path);
-    });
+  Future<void> selectFromGalleryImage() async {
+    final ImagePicker _picker = ImagePicker();
+    var choosedimage = await _picker.pickImage(source: ImageSource.gallery);
+    if (choosedimage != null) {
+      setState(() {
+        uploadimage = choosedimage;
+        documentUploadExt = "jpeg";
+        _image = File(choosedimage.path);
+      });
+    }
   }
 
   choosePDF() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [ 'pdf'],
+      allowedExtensions: ['pdf'],
     );
-    if (result == null) return;  // if user don't pick any thing then do nothing just return.
+    if (result == null)
+      return; // if user don't pick any thing then do nothing just return.
     platformFile = result.files.first;
-
-
   }
 }
 

@@ -69,24 +69,26 @@ class WorkOrderResponse {
   int accyear;
 
   factory WorkOrderResponse.fromJson(Map<String, dynamic> json) =>
+
       WorkOrderResponse(
-        callid: json["CALLID"],
-        ticketno: json["TICKETNO"],
+        callid: (json["CALLID"] == null) ? 0 :  json["CALLID"],
+        ticketno: json["TICKETNO"]?? '',
         ticketdate: DateTime.parse(json["TICKETDATE"]),
         workorderid: List<Workorderid>.from(
             json["WORKORDERID"].map((x) => Workorderid.fromJson(x))),
         partyid:
             List<Partyid>.from(json["PARTYID"].map((x) => Partyid.fromJson(x))),
-        machid: json["MACHID"],
-        complain: json["COMPLAIN"],
-        inwarranty: json["INWARRANTY"],
-        callemp: json["CALLEMP"],
-        callempname: json["CALLEMPNAME"],
-        visittype: json["VISITTYPE"],
-        ischargable: json["ISCHARGABLE"],
-        compid: json["COMPID"],
-        compname: json["COMPNAME"],
-        accyear: json["ACCYEAR"],
+
+        machid: (json["MACHID"] == null) ? 0 : json["MACHID"],
+        complain:  (json["COMPLAIN"] == null) ? "" : json["COMPLAIN"],
+        inwarranty:  (json["INWARRANTY"] == null) ? 0 : json["INWARRANTY"],
+        callemp:(json["CALLEMP"] == null) ? 0 : json["CALLEMP"],
+        callempname: json["CALLEMPNAME"]?? '',
+        visittype: json["VISITTYPE"]?? '',
+        ischargable:(json["ISCHARGABLE"] == null) ? 0 : json["ISCHARGABLE"],
+        compid: (json["COMPID"] == null) ? 0 :json["COMPID"],
+        compname: json["COMPNAME"]?? '',
+        accyear:(json["ACCYEAR"] == null) ? 0 : json["ACCYEAR"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -136,17 +138,17 @@ class Partyid {
   dynamic contactperson;
 
   factory Partyid.fromJson(Map<String, dynamic> json) => Partyid(
-        prtyid: json["PRTYID"],
-        pname: json["PNAME"],
-        contact: json["CONTACT"],
-        mailid: json["MAILID"],
-        profile: json["PROFILE"],
-        address: json["ADDRESS"],
-        compid: json["COMPID"],
-        createdat: json["CREATEDAT"],
-        updatedat: json["UPDATEDAT"],
-        addedby: json["ADDEDBY"],
-        contactperson: json["CONTACTPERSON"],
+        prtyid:  (json["PRTYID"] == null) ? 0 :json["PRTYID"],
+        pname: json["PNAME"]?? '',
+        contact: json["CONTACT"]?? '',
+        mailid: json["MAILID"]?? '',
+        profile: json["PROFILE"]?? '',
+        address: json["ADDRESS"]?? '',
+        compid: json["COMPID"]?? '',
+        createdat: json["CREATEDAT"]?? '',
+        updatedat: json["UPDATEDAT"]?? '',
+        addedby: json["ADDEDBY"]?? '',
+        contactperson: json["CONTACTPERSON"]?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -214,28 +216,28 @@ class Workorderid {
   String machcomp;
 
   factory Workorderid.fromJson(Map<String, dynamic> json) => Workorderid(
-        wordid: json["WORDID"],
-        wono: json["WONO"],
+        wordid: (json["WORDID"] == null) ? 0 : json["WORDID"],
+        wono: json["WONO"]?? '',
         wodate: DateTime.parse(json["WODATE"]),
-        panelno: json["PANELNO"],
-        visitplace: json["VISITPLACE"],
-        visitgrade: json["VISITGRADE"],
-        prtyid: json["PRTYID"],
-        machcompid: json["MACHCOMPID"],
-        oem: json["OEM"],
-        desc1: json["DESC1"],
-        vno: json["VNO"],
+        panelno: json["PANELNO"]?? '',
+        visitplace: json["VISITPLACE"]?? '',
+        visitgrade: json["VISITGRADE"]?? '',
+        prtyid:(json["PRTYID"] == null) ? 0 :  json["PRTYID"],
+        machcompid:(json["MACHCOMPID"] == null) ? 0 :  json["MACHCOMPID"],
+        oem: json["OEM"]?? '',
+        desc1: json["DESC1"]?? '',
+        vno: json["VNO"]?? '',
         vdate: DateTime.parse(json["VDATE"]),
-        despdate: json["DESPDATE"],
-        typeofsale: json["TYPEOFSALE"],
-        warrperiod: json["WARRPERIOD"],
-        errcomdate: json["ERRCOMDATE"],
-        errcomby: json["ERRCOMBY"],
-        finerrdate: json["FINERRDATE"],
-        finalreeby: json["FINALREEBY"],
-        compid: json["COMPID"],
+        despdate: json["DESPDATE"]?? '',
+        typeofsale: json["TYPEOFSALE"]?? '',
+        warrperiod: json["WARRPERIOD"]?? '',
+        errcomdate: json["ERRCOMDATE"]?? '',
+        errcomby: json["ERRCOMBY"]?? '',
+        finerrdate: json["FINERRDATE"]?? '',
+        finalreeby: json["FINALREEBY"]?? '',
+        compid:(json["COMPID"] == null) ? 0 :  json["COMPID"],
         resposibleperson: json["RESPOSIBLEPERSON"],
-        machcomp: json["MACHCOMP"],
+        machcomp: json["MACHCOMP"]?? '',
       );
 
   Map<String, dynamic> toJson() => {

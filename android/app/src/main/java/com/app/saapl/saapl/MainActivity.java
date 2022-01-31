@@ -1,4 +1,4 @@
-package com.app.saapl.saapl;
+package com.app.saapl;
 
 import io.flutter.embedding.android.FlutterActivity;
 

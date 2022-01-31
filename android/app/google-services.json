@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "863167908262",
+    "project_id": "saapl-adc89",
+    "storage_bucket": "saapl-adc89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863167908262:android:0774dd671458686122a767",
+        "android_client_info": {
+          "package_name": "com.app.saapl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863167908262-km8pd1m8upsbcaqtlraojpihn3d3vcl5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.saapl",
+            "certificate_hash": "43d86ce65037d268407bbce8ef3b698240b4e257"
+          }
+        },
+        {
+          "client_id": "863167908262-d86059u6sq4crbndpa5fukbia9urrhcp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4pZwAQ-3DjyH9EokOOdl5bPSlTt1jT-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863167908262-d86059u6sq4crbndpa5fukbia9urrhcp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

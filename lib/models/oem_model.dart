@@ -28,7 +28,7 @@ class Data {
   late final String MACHCOMP;
 
   Data.fromJson(Map<String, dynamic> json){
-    MACHCOMPID = json['MACHCOMPID'];
+    MACHCOMPID = (json["MACHCOMPID"] == null) ? 0 :   json['MACHCOMPID'];
     MACHCOMP = json['MACHCOMP'];
   }
 

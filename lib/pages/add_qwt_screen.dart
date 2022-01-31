@@ -433,6 +433,7 @@ class _QWTScreenState extends State<QWTScreen> {
     return false;
   }
 
+  late String screenshotName;
   Future<bool> saveImage(image) async {
     //final boundary =
     //genKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -441,6 +442,7 @@ class _QWTScreenState extends State<QWTScreen> {
     //final imageBytes = byteData?.buffer.asUint8List();
     final imageBytes =
         image; //await resizeImage(); // byteData?.buffer.asUint8List();
+    screenshotName = "screenshot"+DateTime.now().millisecondsSinceEpoch.toString()+".jpeg";
 
     Directory directory;
     try {
@@ -478,18 +480,25 @@ class _QWTScreenState extends State<QWTScreen> {
         await directory.create(recursive: true);
       }
       if (await directory.exists()) {
+
         File saveFile =
-            await File('${directory.path}/container_image.jpeg').create();
+            await File('${directory.path}/'+screenshotName).create();
 
         if (imageBytes != null) {
           final result = await ImageGallerySaver.saveImage(imageBytes,
-              quality: 100, name: "container_image.jpeg");
-          print(result);
-        }
+              quality: 100, name: screenshotName);
+          print("SAVEDIMAGE"+result.toString());
+          if (Platform.isAndroid) {
+            screenshotName="../Pictures/"+screenshotName;
+          }
+          print("SAVEDIMAGE = "+screenshotName);
 
+        }
         if (Platform.isIOS) {
           await ImageGallerySaver.saveFile(saveFile.path,
               isReturnPathOfIOS: true);
+          screenshotName="../Pictures/"+screenshotName;
+
         }
         return true;
       }
@@ -553,7 +562,7 @@ class _QWTScreenState extends State<QWTScreen> {
         _isInAsyncCall = false;
       });
       print(resBody);
-      _showToast("Data Added Successfully");
+      _showToast(screenshotName);
       Navigator.pop(context);
     } else {
       print("Error");
@@ -591,7 +600,7 @@ class _QWTScreenState extends State<QWTScreen> {
     fToast.showToast(
       child: toast,
       gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 1),
+      toastDuration: Duration(seconds: 2),
     );
   }
 

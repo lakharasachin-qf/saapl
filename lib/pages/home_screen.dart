@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:saapl/models/intent_helper.dart';
+import 'package:saapl/models/login_model.dart';
 import 'package:saapl/models/work_model.dart';
 import 'package:saapl/utils/api_services.dart';
 import 'package:saapl/utils/apis_collection.dart';
@@ -30,7 +31,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   bool isLoading = false;
   var apiService;
   late List<WorkOrderResponse> dataList = [];
-  final GlobalKey<_HomeScreenState> _myWidgetState = GlobalKey<_HomeScreenState>();
+  final GlobalKey<_HomeScreenState> _myWidgetState =
+  GlobalKey<_HomeScreenState>();
+
   getBrands() {
     var apiService = APIService();
     apiService.getWorkOrderList().then((value) async {
@@ -47,13 +50,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _isInAsyncCall = true;
       } else if (actionFlag == "apiEnd") {
         _isInAsyncCall = false;
-      }else if (actionFlag == "apiEndS") {
+      } else if (actionFlag == "apiEndS") {
         _isInAsyncCall = false;
         _showToast("Attendance Submitted");
       }
     });
-     if(actionFlag == "getLocation"){
-    eventToGetLocation();
+    if (actionFlag == "getLocation") {
+      eventToGetLocation();
     }
   }
 
@@ -76,14 +79,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-
-
   @override
   void initState() {
     super.initState();
     fToast = FToast();
     fToast.init(context);
-    _appBar = CustomAppBar(callback,key: _myWidgetState,);
+    _appBar = CustomAppBar(
+      callback,
+      key: _myWidgetState,
+    );
 
     WidgetsBinding.instance!.addObserver(this);
 
@@ -92,7 +96,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     setState(() {
       isLoading = true;
     });
-
   }
 
   var intentHelper = IntentHelper();
@@ -114,7 +117,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     setState(() {
       isLoading = true;
     });
-    Map<String, dynamic> map = {'empId': '111', 'role': ''};
+    pref = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> jsondatais = jsonDecode(pref.getString('user')!);
+    Data user = Data.fromJson(jsondatais);
+
+    Map<String, dynamic> map = {
+      'empId': user.empId.toString(),
+      'role': user.role.toString()
+    };
+    print("response " + (map.toString()));
 
     final response = await http.post(Uri.parse(api_work_order_list), body: map);
     if (response.statusCode == 200 || response.statusCode == 400) {
@@ -148,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         onRefresh: () {
           return Future.delayed(
             const Duration(seconds: 1),
-            () {
+                () {
               loadData();
             },
           );
@@ -162,30 +174,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               (dataList.isNotEmpty)
                   ? ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: dataList.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          width: getWidth(context),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(50)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                              color: Colors.white),
-                          margin: const EdgeInsets.only(
-                              top: 10, left: 15, bottom: 10, right: 15),
-                          child: _getBrandItem(dataList[index]),
-                        );
-                      })
-                  : _buildProgressIndicator()
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: dataList.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: getWidth(context),
+                      decoration: BoxDecoration(
+                          borderRadius:
+                          const BorderRadius.all(Radius.circular(50)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                          color: Colors.white),
+                      margin: const EdgeInsets.only(
+                          top: 10, left: 15, bottom: 10, right: 15),
+                      child: _getBrandItem(dataList[index]),
+                    );
+                  })
+                  : _buildProgressIndicator(),
             ],
           ),
         ),
@@ -194,16 +206,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Widget _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
+    if (isLoading) {
+      return new Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: new Center(
+          child: new Opacity(
+            opacity: isLoading ? 1.0 : 00,
+            child: new CircularProgressIndicator(),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
+    else
+      return new Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: new Center(
+          heightFactor: 4,
+          child: new Container(
+            height: 200,
+            child: Text("No data found",style: TextStyle(fontSize: 15),),
+          ),
+        ),
+      );
+    }
 
   Widget _getBrandItem(WorkOrderResponse model) {
     return Material(
@@ -220,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         },
         child: Container(
           margin:
-              const EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+          const EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -247,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      model.workorderid[0].machcomp,
+                      (model.workorderid.length>0)?model.workorderid[0].machcomp:'Not Filled',
                       maxLines: 1,
                       style: const TextStyle(
                           color: Colors.black,
@@ -289,8 +314,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-
-
   late FToast fToast;
 
   _showToast(String msg) {
@@ -325,8 +348,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-  String location ='Null, Press Button';
+  String location = 'Null, Press Button';
   String Address = 'search';
+
   Future<Position> _getGeoLocationPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -365,22 +389,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
-  Future<void> GetAddressFromLatLong(Position position)async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+
+  Future<void> GetAddressFromLatLong(Position position) async {
+    List<Placemark> placemarks =
+    await placemarkFromCoordinates(position.latitude, position.longitude);
     print(placemarks);
     Placemark place = placemarks[0];
-    Address = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    Address =
+    '${place.street}, ${place.subLocality}, ${place.locality}, ${place
+        .postalCode}, ${place.country}';
     pref = await SharedPreferences.getInstance();
 
     await pref.setString("location", Address);
 
-    print("Address = "+Address);
+    print("Address = " + Address);
     _handlePressPlay();
   }
 
-  void _handlePressPlay(){
+  void _handlePressPlay() {
     _appBar.makeApiCall();
   }
 
@@ -390,10 +419,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _showToast("fetching location...");
 
     Position position = await _getGeoLocationPosition();
-    location ='Lat: ${position.latitude} , Long: ${position.longitude}';
-    print("Location = "+location);
+    location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
+    print("Location = " + location);
     GetAddressFromLatLong(position);
   }
-
-
 }

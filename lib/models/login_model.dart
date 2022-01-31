@@ -3,17 +3,21 @@ class LoginResponseModel {
     required this.status,
     required this.message,
     required this.data,
+    required this.ioStatus,
   });
 
   late final int status;
   late final String message;
   late final Data data;
+  late final IOStatus ioStatus;
 
   LoginResponseModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
     if(json['data']!=null) {
       data= (Data.fromJson(json['data']));
+    }  if(json['IOstatus']!=null) {
+      ioStatus= (IOStatus.fromJson(json['IOstatus']));
     }
   }
 
@@ -22,10 +26,29 @@ class LoginResponseModel {
     _data['status'] = status;
     _data['message'] = message;
     _data['data'] = data.toJson();
+    _data['IOstatus'] = ioStatus.toJson();
     return _data;
   }
 }
+class IOStatus{
+  late final String IODATETIME;
+  late final String INOUT;
+  IOStatus({
+    required this.IODATETIME,
+    required this.INOUT
+  });
+  IOStatus.fromJson(Map<String, dynamic> json) {
+    IODATETIME = json['IODATETIME'];
+    INOUT = json['INOUT'];
+  }
 
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['INOUT'] = INOUT;
+    _data['IODATETIME'] = IODATETIME;
+    return _data;
+  }
+}
 class Data {
   Data({
     required this.userId,

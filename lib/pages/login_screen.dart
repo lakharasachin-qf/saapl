@@ -56,8 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
             top: getHeight(context)/4,
             left: 30,
             child: Column(
-              children: [
-                const Text(
+              children: const [
+                Text(
                   "Welcome Back",
                   style: TextStyle(
                     fontSize: 20,
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.white,
                   ),
                 ),
-                const Text(
+                Text(
                   "Log In!",
                   style: TextStyle(
                       fontSize: 40,
@@ -96,11 +96,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 50,
                           ),
                           TextFormField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: "Username",
                             ),
                             controller: usernameController,
-                            style: TextStyle(fontSize: 17, fontFamily: "proxi"),
+                            style: const TextStyle(fontSize: 17, fontFamily: "proxi"),
                             keyboardType: TextInputType.number,
                             cursorColor: primaryColor,
                             validator: (value) {
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Container(
                               alignment: Alignment.center,
                               width: getWidth(context),
-                              child: Text(
+                              child: const Text(
                                 "Log In",
                                 style: TextStyle(
                                     fontFamily: "proxi",
@@ -183,15 +183,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   print("NEW = " + formattedDate);
 
                                   await pref.setString("entryDate", formattedDate);
-                                  await pref.setString(
-                                      "user", jsonEncode(value.data));
+                                  await pref.setString("user", jsonEncode(value.data));
 
                                   await pref.setBool("isLogin", true);
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          HomeScreen(),
+                                          const HomeScreen(),
                                     ),
                                     (route) => false,
                                   );
@@ -219,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return ProgressHUD(
-      key: new Key("te"),
+      key: Key("te"),
       child: _uiSetup(context),
       inAsyncCall: isLoading,
       opacity: 0.3,
@@ -236,16 +235,16 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
           Text(
               msg,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
@@ -254,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
     fToast.showToast(
       child: toast,
       gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 2),
+      toastDuration: const Duration(seconds: 2),
     );
   }
 }
