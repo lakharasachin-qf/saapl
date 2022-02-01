@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     fToast = FToast();
     fToast.init(context);
+    getToken();
   }
 
   bool _isObscure = true;
@@ -167,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               String password = passwordController.text;
                               var apiService = APIService();
                               apiService
-                                  .login(userName, password)
+                                  .login(userName, password, deviceToken)
                                   .then((value) async {
                                 print(value);
                                 if (value.status == 1) {
@@ -285,5 +287,12 @@ class _LoginScreenState extends State<LoginScreen> {
       gravity: ToastGravity.BOTTOM,
       toastDuration: const Duration(seconds: 2),
     );
+  }
+
+  String deviceToken = "";
+
+  getToken() async {
+    deviceToken = (await FirebaseMessaging.instance.getToken())!;
+
   }
 }

@@ -30,19 +30,17 @@ class APIService {
     final response = await http.post(Uri.parse(api_login), headers: header);
     if (response.statusCode == 200 || response.statusCode == 400) {
       print("response " + (response.body));
-      var dataComment = {
-        'data': json.decode(response.body)
-      };
+      var dataComment = {'data': json.decode(response.body)};
 
-      return WorkOrderAPIResponse.fromJson(json.decode(json.encode(dataComment))).data;
+      return WorkOrderAPIResponse.fromJson(
+              json.decode(json.encode(dataComment)))
+          .data;
     } else {
       throw Exception('Failed to load data');
     }
   }
 
-
-
-  Future<WorkOrderResponse> getWorkOrder(Map<String,dynamic> bodyData) async {
+  Future<WorkOrderResponse> getWorkOrder(Map<String, dynamic> bodyData) async {
     Map<String, String> header = {};
     header["Accept"] = "application/x-www-form-urlencoded";
     header["Content-Type"] = "application/x-www-form-urlencoded";
@@ -50,7 +48,8 @@ class APIService {
     if (tokens.isNotEmpty) {
       header["X-Authorization"] = "Bearer " + tokens;
     }
-    final response = await http.post(Uri.parse(getBrandCategories), headers: header,body: bodyData);
+    final response = await http.post(Uri.parse(getBrandCategories),
+        headers: header, body: bodyData);
     if (response.statusCode == 200 || response.statusCode == 400) {
       print("response " + (response.body));
 
@@ -62,17 +61,18 @@ class APIService {
     }
   }
 
-
-
-
-  Future<LoginResponseModel> login(String userName, String password) async {
+  Future<LoginResponseModel> login(
+      String userName, String password, String deviceToken) async {
+    print("userName = " + userName);
+    print("password = " + password);
+    print("deviceToken = " + deviceToken);
     Map<String, dynamic> map = {
       'username': userName,
-      'password':password
+      'password': password,
+      'deviceToken': deviceToken
     };
 
-    final response =
-        await http.post(Uri.parse(api_login), body: map);
+    final response = await http.post(Uri.parse(api_login), body: map);
     if (response.statusCode == 200 || response.statusCode == 400) {
       print(response.body);
       return LoginResponseModel.fromJson(json.decode(response.body));
