@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:saapl/models/intent_helper.dart';
 import 'package:saapl/utils/api_services.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
 
 import '../colors.dart';
 import 'home_screen.dart';
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             left: -25,
           ),
           Positioned(
-            top: getHeight(context)/4,
+            top: getHeight(context) / 4,
             left: 30,
             child: Column(
               children: const [
@@ -100,7 +100,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               hintText: "Username",
                             ),
                             controller: usernameController,
-                            style: const TextStyle(fontSize: 17, fontFamily: "proxi"),
+                            style: const TextStyle(
+                                fontSize: 17, fontFamily: "proxi"),
                             keyboardType: TextInputType.number,
                             cursorColor: primaryColor,
                             validator: (value) {
@@ -168,22 +169,51 @@ class _LoginScreenState extends State<LoginScreen> {
                               apiService
                                   .login(userName, password)
                                   .then((value) async {
-                                    print(value);
+                                print(value);
                                 if (value.status == 1) {
                                   pref = await SharedPreferences.getInstance();
                                   print(value.message);
                                   setState(() {
                                     isLoading = false;
                                   });
-                                  //await pref.setString("isInOut", "N");
-                                  await pref.setString("isInOut", "O");
-                                  var now = DateTime.now().subtract(Duration(days: 1));
+                                  //await pref.setString("isInOut", "N"); 2021-12-31 12:00:00.000
+                                  var lastEntryDateHold = value.ioStatus
+                                      .IODATETIME; //"2022-02-01 12:00:00.000";//value.ioStatus.IODATETIME;
+                                  var now = DateTime.now();
                                   var formatter = DateFormat('yyyy-MM-dd');
+                                  var lastEntryDate =
+                                      DateFormat('yyyy-MM-dd h:m:s')
+                                          .parse(lastEntryDateHold);
                                   String formattedDate = formatter.format(now);
+                                  print("lastEntryDate = " +
+                                      formatter.format(lastEntryDate));
                                   print("NEW = " + formattedDate);
 
-                                  await pref.setString("entryDate", formattedDate);
-                                  await pref.setString("user", jsonEncode(value.data));
+                                  var berlinWallFellDate =
+                                      lastEntryDate.toUtc();
+                                  int diff =
+                                      now.difference(berlinWallFellDate).inDays;
+                                  print("NEW = " + diff.toString());
+
+                                  if (diff == 0) {
+                                    //today
+                                    if (value.ioStatus.INOUT == 'I') {
+                                      await pref.setString("isInOut", "I");
+                                      await pref.setString(
+                                          "entryDate", formattedDate);
+                                    } else {
+                                      await pref.setString("isInOut", "O");
+                                      await pref.setString(
+                                          "entryDate", formattedDate);
+                                    }
+                                  } else if (diff > 0) {
+                                    await pref.setString("isInOut", "O");
+                                    await pref.setString(
+                                        "entryDate", formattedDate);
+                                  }
+
+                                  await pref.setString(
+                                      "user", jsonEncode(value.data));
 
                                   await pref.setBool("isLogin", true);
                                   Navigator.pushAndRemoveUntil(
@@ -243,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
             width: 10.0,
           ),
           Text(
-              msg,
+            msg,
             style: const TextStyle(color: Colors.white),
           ),
         ],

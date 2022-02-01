@@ -10,6 +10,7 @@ import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:images_picker/images_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -46,6 +47,8 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   late FToast fToast;
   String btnText = "Continue";
   int formStep = 1;
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -788,16 +791,17 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                     leading: const Icon(Icons.photo_camera),
                     title: const Text('Open Camera'),
                     onTap: () {
-                      chooseImage();
                       Navigator.of(context).pop();
+
+                      chooseImage();
                     },
                   ),
                   ListTile(
                     leading: const Icon(Icons.photo_camera),
                     title: const Text('Select Gallery'),
                     onTap: () {
-                      selectFromGalleryImage();
                       Navigator.of(context).pop();
+                      getImage();
                     },
                   ),
                   ListTile(
@@ -821,26 +825,55 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   late var platformFile;
 
   Future<void> chooseImage() async {
-    final ImagePicker _picker = ImagePicker();
-    var choosedimage = await _picker.pickImage(source: ImageSource.camera);
-    if (choosedimage != null) {
-      setState(() {
-        uploadimage = choosedimage;
-        documentUploadExt = "jpeg";
-        _image = File(choosedimage.path);
-      });
+    List<Media>? res = await ImagesPicker.openCamera(
+      pickType: PickType.image,
+      quality: 0.7
+    );
+
+    if (res != null) {
+      documentUploadExt = "jpeg";
+      _image = File(res[0].path);
+      setState(() {});
+    }
+    //
+    // final ImagePicker _picker = ImagePicker();
+    // var choosedimage = await _picker.pickImage(source: ImageSource.camera);
+    // if (choosedimage != null) {
+    //   setState(() {
+    //     uploadimage = choosedimage;
+    //     documentUploadExt = "jpeg";
+    //     _image = File(choosedimage.path);
+    //   });
+    // }
+  }
+
+  Future getImage() async {
+    List<Media>? res = await ImagesPicker.pick(
+      count: 1,
+      pickType: PickType.image,
+      quality: 0.7
+    );
+    if (res != null) {
+      documentUploadExt = "jpeg";
+      _image = File(res[0].path);
+      setState(() {});
     }
   }
 
-  Future<void> selectFromGalleryImage() async {
-    final ImagePicker _picker = ImagePicker();
-    var choosedimage = await _picker.pickImage(source: ImageSource.gallery);
-    if (choosedimage != null) {
-      setState(() {
-        uploadimage = choosedimage;
-        documentUploadExt = "jpeg";
-        _image = File(choosedimage.path);
-      });
+  selectFromGalleryImage() async {
+    return;
+
+    try {
+      var choosedimage = await _picker.pickImage(
+          source: ImageSource.gallery, imageQuality: 50);
+      if (choosedimage == null) return;
+
+      documentUploadExt = "jpeg";
+      _image = File(choosedimage.path);
+      uploadimage = choosedimage;
+      setState(() {});
+    } catch (error) {
+      debugPrint(error.toString());
     }
   }
 
@@ -849,8 +882,10 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
-    if (result == null)
-      return; // if user don't pick any thing then do nothing just return.
+    if (result == null) {
+      return;
+    }
+    // if user don't pick any thing then do nothing just return.
     platformFile = result.files.first;
   }
 }
