@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
 import 'package:saapl/models/intent_helper.dart';
 import 'package:saapl/utils/api_services.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import '../colors.dart';
 import 'home_screen.dart';
@@ -104,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: usernameController,
                             style: const TextStyle(
                                 fontSize: 17, fontFamily: "proxi"),
-                            keyboardType: TextInputType.number,
                             cursorColor: primaryColor,
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -144,7 +143,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(
                             height: 50,
                           ),
-                          RaisedButton(
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(secondaryColor),
+                                padding: MaterialStateProperty.all(
+                                  EdgeInsets.only(
+                                      left: 15, right: 15, top: 18, bottom: 18),
+                                ),
+                                textStyle: MaterialStateProperty.all(
+                                    const TextStyle(
+                                        fontSize: 14, color: Colors.white))),
                             child: Container(
                               alignment: Alignment.center,
                               width: getWidth(context),
@@ -157,6 +166,80 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                String userName = usernameController.text;
+                                String password = passwordController.text;
+                                var apiService = APIService();
+                                apiService
+                                    .login(userName, password, deviceToken)
+                                    .then((value) async {
+                                  print(value);
+                                  if (value.status == 1) {
+                                    pref =
+                                        await SharedPreferences.getInstance();
+                                    print(value.message);
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+
+                                    var lastEntryDateHold =
+                                        value.ioStatus.IODATETIME;
+                                    var now = DateTime.now();
+
+                                    var formatter = DateFormat('yyyy-MM-dd');
+                                    var lastEntryDate =
+                                        DateFormat('yyyy-MM-dd h:m:s')
+                                            .parse(lastEntryDateHold);
+                                    String formattedDate =
+                                        formatter.format(now);
+                                    print("lastEntryDate = " +
+                                        formatter.format(lastEntryDate));
+                                    print("NEW = " + formattedDate);
+
+                                    var berlinWallFellDate =
+                                        lastEntryDate.toUtc();
+                                    int diff = now
+                                        .difference(berlinWallFellDate)
+                                        .inDays;
+                                    print("NEW = " + diff.toString());
+
+                                    if (diff == 0) {
+                                      if (value.ioStatus.INOUT == 'I') {
+                                        await pref.setString("isInOut", "I");
+                                        await pref.setString(
+                                            "entryDate", formattedDate);
+                                      } else {
+                                        await pref.setString("isInOut", "O");
+                                        await pref.setString(
+                                            "entryDate", formattedDate);
+                                      }
+                                    } else if (diff > 0) {
+                                      await pref.setString("isInOut", "O");
+                                      await pref.setString(
+                                          "entryDate", formattedDate);
+                                    }
+
+                                    await pref.setString(
+                                        "user", jsonEncode(value.data));
+
+                                    await pref.setBool("isLogin", true);
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const HomeScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  } else {
+                                    print('apiResponse::${value.message}');
+                                    _showToast(value.message);
+                                  }
+                                });
+                              } else {
+                                print('Not Validate');
+                              }
+
                               // intentHelper.mobileNo =
                               //     mobileNoController.text;
                               // Navigator.push(
@@ -165,76 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               //         builder: (context) =>
                               //             VerificationScreen(
                               //                 intentData: intentHelper)));
-                              String userName = usernameController.text;
-                              String password = passwordController.text;
-                              var apiService = APIService();
-                              apiService
-                                  .login(userName, password, deviceToken)
-                                  .then((value) async {
-                                print(value);
-                                if (value.status == 1) {
-                                  pref = await SharedPreferences.getInstance();
-                                  print(value.message);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  //await pref.setString("isInOut", "N"); 2021-12-31 12:00:00.000
-                                  var lastEntryDateHold = value.ioStatus
-                                      .IODATETIME; //"2022-02-01 12:00:00.000";//value.ioStatus.IODATETIME;
-                                  var now = DateTime.now();
-                                  var formatter = DateFormat('yyyy-MM-dd');
-                                  var lastEntryDate =
-                                      DateFormat('yyyy-MM-dd h:m:s')
-                                          .parse(lastEntryDateHold);
-                                  String formattedDate = formatter.format(now);
-                                  print("lastEntryDate = " +
-                                      formatter.format(lastEntryDate));
-                                  print("NEW = " + formattedDate);
-
-                                  var berlinWallFellDate =
-                                      lastEntryDate.toUtc();
-                                  int diff =
-                                      now.difference(berlinWallFellDate).inDays;
-                                  print("NEW = " + diff.toString());
-
-                                  if (diff == 0) {
-                                    //today
-                                    if (value.ioStatus.INOUT == 'I') {
-                                      await pref.setString("isInOut", "I");
-                                      await pref.setString(
-                                          "entryDate", formattedDate);
-                                    } else {
-                                      await pref.setString("isInOut", "O");
-                                      await pref.setString(
-                                          "entryDate", formattedDate);
-                                    }
-                                  } else if (diff > 0) {
-                                    await pref.setString("isInOut", "O");
-                                    await pref.setString(
-                                        "entryDate", formattedDate);
-                                  }
-
-                                  await pref.setString(
-                                      "user", jsonEncode(value.data));
-
-                                  await pref.setBool("isLogin", true);
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          const HomeScreen(),
-                                    ),
-                                    (route) => false,
-                                  );
-                                } else {
-                                  _showToast(value.message);
-                                }
-                              });
                             },
-                            color: secondaryColor,
-                            textColor: Colors.white,
-                            padding: const EdgeInsets.only(
-                                left: 15, right: 15, top: 18, bottom: 18),
+                            // color: secondaryColor,
+                            // textColor: Colors.white,
+                            // padding: const EdgeInsets.only(
+                            //     left: 15, right: 15, top: 18, bottom: 18),
                           )
                         ],
                       ),
@@ -259,6 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _showToast(String msg) {
     Widget toast = Container(
+      margin: EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(25.0),
@@ -274,9 +293,12 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(
             width: 10.0,
           ),
-          Text(
-            msg,
-            style: const TextStyle(color: Colors.white),
+          Flexible(
+            flex: 1,
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -284,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     fToast.showToast(
       child: toast,
-      gravity: ToastGravity.BOTTOM,
+      gravity: ToastGravity.TOP,
       toastDuration: const Duration(seconds: 2),
     );
   }
@@ -293,6 +315,5 @@ class _LoginScreenState extends State<LoginScreen> {
 
   getToken() async {
     deviceToken = (await FirebaseMessaging.instance.getToken())!;
-
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -49,7 +48,7 @@ class _SpleshScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-          child: Image.asset("assets/logo.png").centered().wh40(context)),
+          child: Image.asset("assets/logo.png",height: 100,)),
     );
   }
 }

@@ -11,13 +11,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:images_picker/images_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:saapl/models/call_details_model.dart';
 import 'package:saapl/models/work_model.dart';
 import 'package:saapl/utils/apis_collection.dart';
 import 'package:saapl/utils/screen_loader.dart';
+import 'package:intl/intl.dart';
 
 import '../colors.dart';
 
@@ -135,9 +135,12 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: const Text(
-            "Edit Work Order",
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            "Work Order No. " +
+                (widget.model.workorderid.isNotEmpty
+                    ? " (" + widget.model.workorderid[0].wono + ")"
+                    : ""),
+            style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           iconTheme: const IconThemeData(color: Colors.white),
         ),
@@ -338,7 +341,17 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                     //         : Container()
                     //     : Container(),
                     (formStep == 2)
-                        ? RaisedButton(
+                        ? ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(secondaryColor),
+                                padding: MaterialStateProperty.all(
+                                  EdgeInsets.only(
+                                      left: 15, right: 15, top: 18, bottom: 18),
+                                ),
+                                textStyle: MaterialStateProperty.all(
+                                    const TextStyle(
+                                        fontSize: 14, color: Colors.white))),
                             child: Container(
                               alignment: Alignment.center,
                               width: getWidth(context) / 3,
@@ -370,10 +383,10 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                               //             VerificationScreen(
                               //                 intentData: intentHelper)));
                             },
-                            color: secondaryColor,
-                            textColor: Colors.white,
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, top: 12, bottom: 12),
+                            // color: secondaryColor,
+                            // textColor: Colors.white,
+                            // padding: const EdgeInsets.only(
+                            //     left: 12, right: 12, top: 12, bottom: 12),
                           )
                         : Container(),
                     const SizedBox(
@@ -395,7 +408,16 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    RaisedButton(
+                    ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(secondaryColor),
+                          padding: MaterialStateProperty.all(
+                            EdgeInsets.only(
+                                left: 15, right: 15, top: 18, bottom: 18),
+                          ),
+                          textStyle: MaterialStateProperty.all(const TextStyle(
+                              fontSize: 14, color: Colors.white))),
                       child: Container(
                         alignment: Alignment.center,
                         width: getWidth(context),
@@ -421,10 +443,10 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
                           }
                         }
                       },
-                      color: secondaryColor,
-                      textColor: Colors.white,
-                      padding: const EdgeInsets.only(
-                          left: 15, right: 15, top: 18, bottom: 18),
+                      // color: secondaryColor,
+                      // textColor: Colors.white,
+                      // padding: const EdgeInsets.only(
+                      //     left: 15, right: 15, top: 18, bottom: 18),
                     ),
                     const SizedBox(
                       height: 50,
@@ -460,13 +482,10 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   late String generatedPdfFilePath;
 
   generatePDFSample() async {
-    //var date = new Date();
     var name = "sachin";
     var now = DateTime.now();
     var formatter = DateFormat('yyyy-MM-dd');
-    var formattedDate = formatter.parse(detailsObject.TICKETDATE);
 
-    //detailsObject.TICKETDATE
     print("DAAAA = " +
         formatter.format(formatter.parse(detailsObject.TICKETDATE)).toString());
     var _CompanyName = (detailsObject.COMPNAME.isNotEmpty)
@@ -742,9 +761,12 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
           const SizedBox(
             width: 10.0,
           ),
-          Text(
-            msg,
-            style: const TextStyle(color: Colors.white),
+          Flexible(
+            flex: 1,
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -825,10 +847,8 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
   late var platformFile;
 
   Future<void> chooseImage() async {
-    List<Media>? res = await ImagesPicker.openCamera(
-      pickType: PickType.image,
-      quality: 0.7
-    );
+    List<Media>? res =
+        await ImagesPicker.openCamera(pickType: PickType.image, quality: 0.7);
 
     if (res != null) {
       documentUploadExt = "jpeg";
@@ -849,10 +869,7 @@ class _EditWorkOrderScreenState extends State<EditWorkOrderScreen> {
 
   Future getImage() async {
     List<Media>? res = await ImagesPicker.pick(
-      count: 1,
-      pickType: PickType.image,
-      quality: 0.7
-    );
+        count: 1, pickType: PickType.image, quality: 0.7);
     if (res != null) {
       documentUploadExt = "jpeg";
       _image = File(res[0].path);

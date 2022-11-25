@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 class MyTheme {
   //https://material.io/design/color/the-color-system.html#tools-for-picking-colors
@@ -53,7 +52,7 @@ const Color darkBluishColor = Color(0xff403b58);
 const Color whiteBackground = Color(0xFFF0F0F0);
 const Color shadowColor = Color(0xE8F3F3F3);
 const Color shadowDarkColor = Color(0xE8A4A4A4);
-const Color lightBluishColor = Vx.indigo500;
+const Color lightBluishColor = Color(0xff376CB1);
 const Color strokeSecondaryColor = Color(0xFFFCEDD0);
 
 double getWidth(BuildContext context) => MediaQuery.of(context).size.width;

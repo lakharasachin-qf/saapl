@@ -50,6 +50,7 @@ class WorkOrderResponse {
     required this.compid,
     required this.compname,
     required this.accyear,
+    required this.oem,
   });
 
   int callid;
@@ -66,6 +67,8 @@ class WorkOrderResponse {
   int ischargable;
   int compid;
   String compname;
+  String oem;
+
   int accyear;
 
   factory WorkOrderResponse.fromJson(Map<String, dynamic> json) =>
@@ -89,6 +92,7 @@ class WorkOrderResponse {
         compid: (json["COMPID"] == null) ? 0 :json["COMPID"],
         compname: json["COMPNAME"]?? '',
         accyear:(json["ACCYEAR"] == null) ? 0 : json["ACCYEAR"],
+        oem:(json["OEM"] == null) ? "" : json["OEM"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -107,6 +111,7 @@ class WorkOrderResponse {
         "COMPID": compid,
         "COMPNAME": compname,
         "ACCYEAR": accyear,
+        "OEM": oem,
       };
 }
 
@@ -217,7 +222,7 @@ class Workorderid {
 
   factory Workorderid.fromJson(Map<String, dynamic> json) => Workorderid(
         wordid: (json["WORDID"] == null) ? 0 : json["WORDID"],
-        wono: json["WONO"]?? '',
+        wono: json["WONO"] ?? "",
         wodate: DateTime.parse(json["WODATE"]),
         panelno: json["PANELNO"]?? '',
         visitplace: json["VISITPLACE"]?? '',

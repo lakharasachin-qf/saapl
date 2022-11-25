@@ -24,7 +24,7 @@ class NotificationService {
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
-    print('Handling a background message ${message.messageId}');
+   // print('Handling a background message ${message.messageId}');
   }
 
   init() async {

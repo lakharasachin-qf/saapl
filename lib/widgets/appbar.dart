@@ -5,12 +5,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:saapl/models/login_model.dart';
 import 'package:saapl/pages/add_qwt_screen.dart';
 import 'package:saapl/pages/login_screen.dart';
 import 'package:saapl/utils/apis_collection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import '../colors.dart';
 
@@ -55,14 +55,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   initSharedPref() async {
     pref = await SharedPreferences.getInstance();
-    //await pref.setString("entryDate", "2022-01-03");
 
     Map<String, dynamic> jsondatais = jsonDecode(pref.getString('user')!);
     user = Data.fromJson(jsondatais);
     String? lastEntryStatus = pref.getString("isInOut");
     String? previousEntryDate = pref.getString("entryDate");
-    // print("app bar "+lastEntryStatus.toString());
-    // print("app bar "+previousEntryDate.toString());
 
     if (jsondatais.isNotEmpty) {
       setState(() {
@@ -70,7 +67,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
         empId = user.empId;
 
         if (previousEntryDate != null) {
-          //if not null means there is entry of either today or previous day
           var formatter = DateFormat('yyyy-MM-dd');
           var now = DateTime.now();
           DateTime tempDate = formatter.parse(previousEntryDate);
@@ -79,7 +75,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
           int diff = now.difference(berlinWallFellDate).inDays;
 
           String formattedDate = formatter.format(now);
-          //print("previous previousEntryDate"+formatter.format(berlinWallFellDate));
           if (diff == 1) {
             currentIconAsset = inIcon;
             flagSubmittingToApi = "I";
@@ -88,8 +83,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
               currentIconAsset = outIcon;
               flagSubmittingToApi = "O";
             } else if (lastEntryStatus == "O") {
-              // currentIconAsset = outIcon;
-              // flagSubmittingToApi = "N";
               currentIconAsset = inIcon;
               flagSubmittingToApi = "I";
             } else if (lastEntryStatus == "N") {
@@ -251,7 +244,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
       final response = await http.post(Uri.parse(api_in_out_data), body: map);
       if (response.statusCode == 200) {
         var resBody = json.decode(response.body);
-        //widget.callback("apiEndS");
         await pref.remove("location");
         var now = DateTime.now();
         var formatter = DateFormat('yyyy-MM-dd');
@@ -259,25 +251,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
         await pref.setString("entryDate", formattedDate);
         await pref.setString("isInOut", flagSubmittingToApi);
-        if (flagSubmittingToApi == "O") {
-          //await pref.setString("isInOut", "N");
-        }
+        if (flagSubmittingToApi == "O") {}
         _showToast("Attendance added");
-        // makeInOutOPR();
-        //initSharedPref();
         print(resBody);
       } else {
         await pref.remove("location");
-        //     widget.callback("apiEnd");
         print("Error");
       }
     } else {
       eventToGetLocation();
-      //widget.callback("getLocation");
     }
   }
-
-// if icon == IN then make entry of In and then replace icon with out
 
   String location = 'Null, Press Button';
   String Address = 'search';
@@ -340,11 +324,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   eventToGetLocation() async {
-     _showToast("fetching location...");
+    _showToast("fetching location...");
 
     Position position = await _getGeoLocationPosition();
     location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
-    print("Location = " + location);
+   // print("Location = " + location);
     GetAddressFromLatLong(position);
   }
 
@@ -362,16 +346,19 @@ class _CustomAppBarState extends State<CustomAppBar> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
-          Text(
-            msg,
-            style: TextStyle(color: Colors.white),
+          Flexible(
+            flex: 1,
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

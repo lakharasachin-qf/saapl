@@ -10,7 +10,6 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:saapl/models/login_model.dart';
-import 'package:saapl/models/work_model.dart';
 import 'package:saapl/utils/apis_collection.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:screenshot/screenshot.dart';
@@ -19,7 +18,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../colors.dart';
 
 class QWTScreen extends StatefulWidget {
-
   QWTScreen({Key? key}) : super(key: key);
 
   @override
@@ -74,7 +72,6 @@ class _QWTScreenState extends State<QWTScreen> {
       inAsyncCall: _isInAsyncCall,
       opacity: 0.3,
     );
-
   }
 
   int LoadingOem = 0;
@@ -116,6 +113,7 @@ class _QWTScreenState extends State<QWTScreen> {
   }
 
   Future<String> getEmployeeList(int apiSource, String apiURL) async {
+    print("getEmployeeList");
     final response = await http.post(Uri.parse(apiURL));
     if (response.statusCode == 200) {
       var resBody = json.decode(response.body);
@@ -125,6 +123,7 @@ class _QWTScreenState extends State<QWTScreen> {
       });
     } else {
       print("Error");
+      print(response.body);
     }
     return "Sucess";
   }
@@ -167,7 +166,8 @@ class _QWTScreenState extends State<QWTScreen> {
           ),
           backgroundColor: Colors.white,
           body: SingleChildScrollView(
-            padding: const EdgeInsets.only(right: 20, left: 20, top: 40),
+            padding:
+                const EdgeInsets.only(right: 20, left: 20, top: 30, bottom: 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -351,7 +351,17 @@ class _QWTScreenState extends State<QWTScreen> {
                       SizedBox(
                         height: 40,
                       ),
-                      RaisedButton(
+                      ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(secondaryColor),
+                            padding: MaterialStateProperty.all(
+                              EdgeInsets.only(
+                                  left: 15, right: 15, top: 18, bottom: 18),
+                            ),
+                            textStyle: MaterialStateProperty.all(
+                                const TextStyle(
+                                    fontSize: 14, color: Colors.white))),
                         child: Container(
                           alignment: Alignment.center,
                           width: getWidth(context),
@@ -371,11 +381,11 @@ class _QWTScreenState extends State<QWTScreen> {
                             });
 
                             screenshotController
-                                .capture(delay: const Duration(milliseconds: 10))
+                                .capture(
+                                    delay: const Duration(milliseconds: 10))
                                 .then((capturedImage) async {
-                                await saveImage(capturedImage);
-                                addQWTApi();
-
+                              await saveImage(capturedImage);
+                              addQWTApi();
                             }).catchError((onError) {
                               print(onError);
                               addQWTApi();
@@ -384,10 +394,10 @@ class _QWTScreenState extends State<QWTScreen> {
                             // use the email provided here
                           }
                         },
-                        color: secondaryColor,
-                        textColor: Colors.white,
-                        padding: const EdgeInsets.only(
-                            left: 15, right: 15, top: 18, bottom: 18),
+                        // color: secondaryColor,
+                        // textColor: Colors.white,
+                        // padding: const EdgeInsets.only(
+                        //     left: 15, right: 15, top: 18, bottom: 18),
                       )
                     ],
                   ),
@@ -442,7 +452,9 @@ class _QWTScreenState extends State<QWTScreen> {
     //final imageBytes = byteData?.buffer.asUint8List();
     final imageBytes =
         image; //await resizeImage(); // byteData?.buffer.asUint8List();
-    screenshotName = "screenshot"+DateTime.now().millisecondsSinceEpoch.toString()+".jpeg";
+    screenshotName = "screenshot" +
+        DateTime.now().millisecondsSinceEpoch.toString() +
+        ".jpeg";
 
     Directory directory;
     try {
@@ -480,25 +492,22 @@ class _QWTScreenState extends State<QWTScreen> {
         await directory.create(recursive: true);
       }
       if (await directory.exists()) {
-
         File saveFile =
-            await File('${directory.path}/'+screenshotName).create();
+            await File('${directory.path}/' + screenshotName).create();
 
         if (imageBytes != null) {
           final result = await ImageGallerySaver.saveImage(imageBytes,
               quality: 100, name: screenshotName);
-          print("SAVEDIMAGE"+result.toString());
+          print("SAVEDIMAGE" + result.toString());
           if (Platform.isAndroid) {
-            screenshotName="../Pictures/"+screenshotName;
+            screenshotName = "../Pictures/" + screenshotName;
           }
-          print("SAVEDIMAGE = "+screenshotName);
-
+          print("SAVEDIMAGE = " + screenshotName);
         }
         if (Platform.isIOS) {
           await ImageGallerySaver.saveFile(saveFile.path,
               isReturnPathOfIOS: true);
-          screenshotName="../Pictures/"+screenshotName;
-
+          screenshotName = "../Pictures/" + screenshotName;
         }
         return true;
       }
@@ -517,28 +526,28 @@ class _QWTScreenState extends State<QWTScreen> {
     String selectedEmployeeId = "0";
     String selectedVisitId = "";
 
-    print("selectedOEM " +selectedOEM);
-    print("selectedParty " +selectedParty);
-    print("selectedEmployee " +selectedEmployee);
+    print("selectedOEM " + selectedOEM);
+    print("selectedParty " + selectedParty);
+    print("selectedEmployee " + selectedEmployee);
 
-    for(int i =0;i<oemDataList.length;i++){
+    for (int i = 0; i < oemDataList.length; i++) {
       if (oemDataList[i]["MACHCOMP"].toString().trim() == selectedOEM) {
         selectedOEMId = oemDataList[i]["MACHCOMPID"].toString();
       }
     }
 
-    for(int i =0;i<partyDataList.length;i++){
+    for (int i = 0; i < partyDataList.length; i++) {
       if (partyDataList[i]["PNAME"].toString().trim() == selectedParty) {
         selectedPartyId = partyDataList[i]["PRTYID"].toString();
       }
     }
 
-    for(int i =0;i<employeeDataList.length;i++){
+    for (int i = 0; i < employeeDataList.length; i++) {
       if (employeeDataList[i]["ENAME"].toString().trim() == selectedEmployee) {
         selectedEmployeeId = employeeDataList[i]["EMPID"].toString();
       }
     }
-    for(int i =0;i<visitType.length;i++){
+    for (int i = 0; i < visitType.length; i++) {
       if (visitType[i]["name"].toString().trim() == selectedVisitType) {
         selectedVisitId = visitType[i]["type"].toString();
       }
@@ -554,7 +563,7 @@ class _QWTScreenState extends State<QWTScreen> {
       'enterBy': userName.trim(),
       'remark': remarkController.text
     };
-    print("PostPARAM " +map.toString());
+    print("PostPARAM " + map.toString());
     final response = await http.post(Uri.parse(api_add_qwt), body: map);
     if (response.statusCode == 200) {
       var resBody = json.decode(response.body);
@@ -569,7 +578,6 @@ class _QWTScreenState extends State<QWTScreen> {
     }
   }
 
-
   late FToast fToast;
 
   _showToast(String msg) {
@@ -582,16 +590,19 @@ class _QWTScreenState extends State<QWTScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
-          Text(
-            msg,
-            style: TextStyle(color: Colors.white),
+          Flexible(
+            flex: 1,
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -603,5 +614,4 @@ class _QWTScreenState extends State<QWTScreen> {
       toastDuration: Duration(seconds: 2),
     );
   }
-
 }

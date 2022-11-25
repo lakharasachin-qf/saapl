@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,7 +13,6 @@ import 'package:saapl/utils/apis_collection.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:saapl/widgets/appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import '../colors.dart';
 import 'edit_work_order_screen.dart';
@@ -32,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   var apiService;
   late List<WorkOrderResponse> dataList = [];
   final GlobalKey<_HomeScreenState> _myWidgetState =
-  GlobalKey<_HomeScreenState>();
+      GlobalKey<_HomeScreenState>();
 
   getBrands() {
     var apiService = APIService();
@@ -160,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         onRefresh: () {
           return Future.delayed(
             const Duration(seconds: 1),
-                () {
+            () {
               loadData();
             },
           );
@@ -174,29 +171,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               (dataList.isNotEmpty)
                   ? ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: dataList.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: getWidth(context),
-                      decoration: BoxDecoration(
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(50)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                          color: Colors.white),
-                      margin: const EdgeInsets.only(
-                          top: 10, left: 15, bottom: 10, right: 15),
-                      child: _getBrandItem(dataList[index]),
-                    );
-                  })
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: dataList.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: getWidth(context),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(50)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                              color: Colors.white),
+                          margin: const EdgeInsets.only(
+                              top: 10, left: 15, bottom: 10, right: 15),
+                          child: _getBrandItem(dataList[index]),
+                        );
+                      })
                   : _buildProgressIndicator(),
             ],
           ),
@@ -216,19 +213,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
       );
-    }
-    else
+    } else
       return new Padding(
         padding: const EdgeInsets.all(8.0),
         child: new Center(
           heightFactor: 4,
           child: new Container(
             height: 200,
-            child: Text("No data found",style: TextStyle(fontSize: 15),),
+            child: Text(
+              "No data found",
+              style: TextStyle(fontSize: 15),
+            ),
           ),
         ),
       );
-    }
+  }
 
   Widget _getBrandItem(WorkOrderResponse model) {
     return Material(
@@ -245,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         },
         child: Container(
           margin:
-          const EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
+              const EdgeInsets.only(left: 15, top: 15, bottom: 15, right: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -271,18 +270,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      (model.workorderid.length>0)?model.workorderid[0].machcomp:'Not Filled',
-                      maxLines: 1,
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
+                    Container(
+                      padding: EdgeInsets.only(right: 3.0),
+                      child: Text(
+                        (model.oem.isNotEmpty &&
+                                model.oem.toString().trim().toUpperCase() !=
+                                    "UNDFIND")
+                            ? model.oem.trim() +
+                                (model.workorderid.isNotEmpty
+                                    ? " (" + model.workorderid[0].wono + ")"
+                                    : "")
+                            : 'Not Filled',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Roboto',
+                          color: Color(0xFF212121),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     Text(
                       model.ticketdate.toString(),
                       maxLines: 1,
-                      style: const TextStyle(fontSize: 13, color: Vx.gray800),
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -326,16 +338,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
-          Text(
-            msg,
-            style: TextStyle(color: Colors.white),
+          Flexible(
+            flex: 1,
+            child: Text(
+              msg,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -395,12 +410,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> GetAddressFromLatLong(Position position) async {
     List<Placemark> placemarks =
-    await placemarkFromCoordinates(position.latitude, position.longitude);
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     print(placemarks);
     Placemark place = placemarks[0];
     Address =
-    '${place.street}, ${place.subLocality}, ${place.locality}, ${place
-        .postalCode}, ${place.country}';
+        '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
     pref = await SharedPreferences.getInstance();
 
     await pref.setString("location", Address);
