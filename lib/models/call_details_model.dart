@@ -40,8 +40,8 @@ class CallDetailsModel {
   CallDetailsModel.fromJson(Map<String, dynamic> json) {
     CALLID = (json["MACHID"] == null) ? 0 : json['CALLID'];
     CALLDETAILS = CALLDETAILSModel.fromJson(json['CALL_DETAILS']);
-    TICKETNO = json['TICKETNO']?? '';
-    TICKETDATE = json['TICKETDATE']?? '';
+    TICKETNO = json['TICKETNO'] ?? '';
+    TICKETDATE = json['TICKETDATE'] ?? '';
     WORKORDERID = List.from(json['WORKORDERID'])
         .map((e) => WORKORDERIDModel.fromJson(e))
         .toList();
@@ -49,15 +49,15 @@ class CallDetailsModel {
         .map((e) => PARTYIDModel.fromJson(e))
         .toList();
     MACHID = (json["MACHID"] == null) ? 0 : json['MACHID'];
-    OEM = json['OEM']?? '';
-    COMPLAIN = json['COMPLAIN']?? '';
-    COMPLAINBY = json['COMPLAIN_BY']?? '';
+    OEM = json['OEM'] ?? '';
+    COMPLAIN = json['COMPLAIN'] ?? '';
+    COMPLAINBY = json['COMPLAIN_BY'] ?? '';
     INWARRANTY = (json["INWARRANTY"] == null) ? 0 : json['INWARRANTY'];
     CALLEMP = (json["CALLEMP"] == null) ? 0 : json['CALLEMP'];
-    VISITTYPE = json['VISITTYPE']?? '';
+    VISITTYPE = json['VISITTYPE'] ?? '';
     ISCHARGABLE = (json["ISCHARGABLE"] == null) ? 0 : json['ISCHARGABLE'];
     COMPID = (json["COMPID"] == null) ? 0 : json['COMPID'];
-    COMPNAME = json['COMPNAME']?? '';
+    COMPNAME = json['COMPNAME'] ?? '';
     ACCYEAR = (json["ACCYEAR"] == null) ? 0 : json['ACCYEAR'];
   }
 
@@ -132,18 +132,18 @@ class CALLDETAILSModel {
     WORKORDERID = (json["WORKORDERID"] == null) ? 0 : json['WORKORDERID'];
     PARTYID = (json["PARTYID"] == null) ? 0 : json['PARTYID'];
     MACHID = (json["MACHID"] == null) ? 0 : json['MACHID'];
-    COMPLAIN = json['COMPLAIN']?? '';
+    COMPLAIN = json['COMPLAIN'] ?? '';
     INWARRANTY = (json["INWARRANTY"] == null) ? 0 : json['INWARRANTY'];
     CALLEMP = (json["CALLEMP"] == null) ? 0 : json['CALLEMP'];
-    VISITTYPE = json['VISITTYPE']?? '';
+    VISITTYPE = json['VISITTYPE'] ?? '';
     ISCHARGABLE = (json["ISCHARGABLE"] == null) ? 0 : json['ISCHARGABLE'];
     COMPID = (json["COMPID"] == null) ? 0 : json['COMPID'];
     ACCYEAR = (json["ACCYEAR"] == null) ? 0 : json['ACCYEAR'];
-    COMPLAINBY = json['COMPLAIN_BY']?? '';
-    COMPLAINTYPE = json['COMPLAIN_TYPE']?? '';
+    COMPLAINBY = json['COMPLAIN_BY'] ?? '';
+    COMPLAINTYPE = json['COMPLAIN_TYPE'] ?? '';
     ISCLOSED = (json["ISCLOSED"] == null) ? 0 : json['ISCLOSED'];
-    COMPANY = json['COMPANY']?? '';
-    ENAME = json['ENAME']?? '';
+    COMPANY = json['COMPANY'] ?? '';
+    ENAME = json['ENAME'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -212,26 +212,26 @@ class WORKORDERIDModel {
   late final String TYPEOFSALE;
   late final String WARRPERIOD;
   late final String ERRCOMDATE;
-  late final String ERRCOMBY;
+  late final int ERRCOMBY;
   late final String FINERRDATE;
-  late final String FINALREEBY;
+  late final int FINALREEBY;
   late final int COMPID;
   late final String RESPOSIBLEPERSON;
   late final String MACHCOMP;
 
   WORKORDERIDModel.fromJson(Map<String, dynamic> json) {
     WORDID = (json["WORDID"] == null) ? 0 : json['WORDID'];
-    WONO = json['WONO']?? '';
-    WODATE = json['WODATE']?? '';
-    PANELNO = json['PANELNO']?? '';
-    VISITPLACE = json['VISITPLACE']?? '';
-    VISITGRADE = json['VISITGRADE']?? '';
+    WONO = json['WONO'] ?? '';
+    WODATE = json['WODATE'] ?? '';
+    PANELNO = json['PANELNO'] ?? '';
+    VISITPLACE = json['VISITPLACE'] ?? '';
+    VISITGRADE = json['VISITGRADE'] ?? '';
     PRTYID = (json["PRTYID"] == null) ? 0 : json['PRTYID'];
     MACHCOMPID = (json["MACHCOMPID"] == null) ? 0 : json['MACHCOMPID'];
     OEM = json['OEM'] ?? '';
-    DESC1 = json['DESC1']?? '';
-    VNO = json['VNO']?? '';
-    VDATE = json['VDATE']?? '';
+    DESC1 = json['DESC1'] ?? '';
+    VNO = json['VNO'] ?? '';
+    VDATE = json['VDATE'] ?? '';
     DESPDATE = json['DESPDATE'] ?? '';
     TYPEOFSALE = json['TYPEOFSALE'] ?? '';
     WARRPERIOD = json['WARRPERIOD'] ?? '';
@@ -241,7 +241,7 @@ class WORKORDERIDModel {
     FINALREEBY = json['FINALREEBY'] ?? '';
     COMPID = (json["COMPID"] == null) ? 0 : json['COMPID'];
     RESPOSIBLEPERSON = json['RESPOSIBLEPERSON'] ?? '';
-    MACHCOMP = json['MACHCOMP']?? '';
+    MACHCOMP = json['MACHCOMP'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -301,7 +301,7 @@ class PARTYIDModel {
 
   PARTYIDModel.fromJson(Map<String, dynamic> json) {
     PRTYID = (json["PRTYID"] == null) ? 0 : json['PRTYID'];
-    PNAME = json['PNAME']?? '';
+    PNAME = json['PNAME'] ?? '';
     CONTACT = json['CONTACT'] ?? '';
     MAILID = json['MAILID'] ?? '';
     PROFILE = json['PROFILE'] ?? '';

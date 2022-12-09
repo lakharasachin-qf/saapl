@@ -1,43 +1,39 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:saapl/models/event_model.dart';
 import 'package:saapl/models/intent_helper.dart';
 import 'package:saapl/models/login_model.dart';
 import 'package:saapl/models/work_model.dart';
+import 'package:saapl/pages/event_details_screen.dart';
 import 'package:saapl/utils/api_services.dart';
 import 'package:saapl/utils/apis_collection.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:saapl/widgets/appbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 import '../colors.dart';
 import 'edit_work_order_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class EventListPage extends StatefulWidget {
+  const EventListPage({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _EventScreenState createState() => _EventScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _EventScreenState extends State<EventListPage>
+    with WidgetsBindingObserver {
   bool isLoading = false;
   var apiService;
-  late List<WorkOrderResponse> dataList = [];
-  final GlobalKey<_HomeScreenState> _myWidgetState =
-      GlobalKey<_HomeScreenState>();
-
-  getBrands() {
-    var apiService = APIService();
-    apiService.getWorkOrderList().then((value) async {
-      setState(() {
-        isLoading = false;
-        //dataList = value.data;
-      });
-    });
-  }
+  late List<EventModel> dataList = [];
+  final GlobalKey<_EventScreenState> _myWidgetState =
+      GlobalKey<_EventScreenState>();
 
   void callback(String actionFlag) {
     setState(() {
@@ -57,34 +53,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // user returned to our app
-      print("OnResume Called");
-      loadData();
-    } else if (state == AppLifecycleState.inactive) {
-      // app is inactive
-    } else if (state == AppLifecycleState.paused) {
-      // user is about quit our app temporally
-    }
   }
 
   @override
   void initState() {
     super.initState();
-    fToast = FToast();
-    fToast.init(context);
-    _appBar = CustomAppBar(
-      callback,
-      key: _myWidgetState,
-    );
-
-    WidgetsBinding.instance!.addObserver(this);
 
     apiService = APIService();
     loadData();
@@ -95,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   var intentHelper = IntentHelper();
   late CustomAppBar _appBar;
-  bool _isInAsyncCall = false;
+  bool _isInAsyncCall = true;
 
   @override
   Widget build(BuildContext context) {
@@ -105,10 +79,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       inAsyncCall: _isInAsyncCall,
       opacity: 0.3,
     );
-    //return _getUI(context);
+    
   }
 
   loadData() async {
+    String deviceToken = (await FirebaseMessaging.instance.getToken())!;
+    print(deviceToken);
     setState(() {
       isLoading = true;
     });
@@ -123,34 +99,86 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     };
     print("response " + (map.toString()));
 
-    final response = await http.post(Uri.parse(api_work_order_list), body: map);
+    final response = await http.post(Uri.parse(callRegiByEventEmp), body: map);
+
+    _isInAsyncCall = false;
+    isLoading = false;
+    //setState(() {});
+
     if (response.statusCode == 200 || response.statusCode == 400) {
       print("response " + (response.body));
-      final json = jsonDecode(response.body);
       if (json != null) {
         List<WorkOrderResponse> tList = [];
-        json.forEach((element) {
-          final student = WorkOrderResponse.fromJson(element);
-          tList.add(student);
-        });
+        var data = eventModelFromJson(response.body);
+        var currentDate = DateTime.now();
+        if (isUpcomming) {
+          data.removeWhere((element) {
+            if (element.dateofevent.isNotEmpty) {
+              var date = DateTime.parse(element.dateofevent);
+              print("Yes Remove  : ");
+              return (date.compareTo(currentDate) == -1);
+            } else {
+              return false;
+            }
+          });
+        } else {
+          data.removeWhere((element) {
+            if (element.dateofevent.isNotEmpty) {
+              var date = DateTime.parse(element.dateofevent);
+              print("Yes Remove  : ");
+              return (date.compareTo(currentDate) != -1);
+            } else {
+              return false;
+            }
+          });
+        }
+
+        data.sort(
+          (a, b) {
+            var data1 = DateTime.parse(a.dateofevent);
+            var data2 = DateTime.parse(b.dateofevent);
+            return data2.compareTo(data1);
+          },
+        );
 
         setState(() {
           isLoading = false;
           dataList.clear();
-          dataList.addAll(tList);
+          dataList.addAll(data);
         });
       }
     } else {
       throw Exception('Failed to load data');
     }
+
+    _isInAsyncCall = false;
+    setState(() {});
   }
 
+  bool isUpcomming = true;
   Widget _getUI(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteBackground,
-      appBar: _appBar,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: Colors.white,
+        ),
+        title: Text(
+          "Events",
+          style: TextStyle(
+            fontSize: 20,
+            fontFamily: "proxi",
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: RefreshIndicator(
         color: Colors.white,
+        key: _myWidgetState,
         backgroundColor: secondaryColor,
         onRefresh: () {
           return Future.delayed(
@@ -164,6 +192,79 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 20,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isUpcomming = true;
+                        _isInAsyncCall = true;
+                      });
+                      loadData();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: isUpcomming ? primaryColor : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: primaryColor, width: 0.5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 4,
+                                offset: const Offset(0, 0))
+                          ]),
+                      padding: EdgeInsets.only(
+                          left: 15, right: 15, top: 7, bottom: 7),
+                      child: Text(
+                        "Upcoming",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: isUpcomming ? Colors.white : Colors.black),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 10,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      loadData();
+                      setState(() {
+                        isUpcomming = false;
+                        _isInAsyncCall = true;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: isUpcomming ? Colors.white : primaryColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: primaryColor, width: 0.5),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 4,
+                                offset: const Offset(0, 0))
+                          ]),
+                      padding: EdgeInsets.only(
+                          left: 15, right: 15, top: 7, bottom: 7),
+                      child: Text(
+                        "Complate",
+                        style: TextStyle(
+                            fontSize: 13,
+                            color: isUpcomming ? Colors.black : Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -201,20 +302,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Widget _buildProgressIndicator() {
-    if (isLoading) {
-      return new Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: new Center(
-          child: new Opacity(
-            opacity: isLoading ? 1.0 : 00,
-            child: new CircularProgressIndicator(),
-          ),
-        ),
-      );
-    } else
-      return new Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: new Center(
+    if (isLoading == false) {
+      return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Center(
           heightFactor: 4,
           child: new Container(
             height: 200,
@@ -225,9 +316,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
       );
+    }
+    return Container();
   }
 
-  Widget _getBrandItem(WorkOrderResponse model) {
+  Widget _getBrandItem(EventModel model) {
     return Material(
       color: Colors.white.withOpacity(0.0),
       child: InkWell(
@@ -235,10 +328,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           borderRadius: BorderRadius.circular(50),
         ),
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditWorkOrderScreen(model: model)));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => EventDetails(model)));
         },
         child: Container(
           margin:
@@ -251,13 +342,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Container(
                       width: 50,
                       height: 50,
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(50)),
-                        color: Colors.white,
+                        color: Colors.grey.shade200,
                       ),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          child: Image.asset("assets/users_place.png"))),
+                      child: SvgPicture.asset(
+                        'assets/images/calendar.svg',
+                        height: 10,
+                        width: 10,
+                        color: Colors.black,
+                      )),
                 ],
               ),
               const SizedBox(
@@ -271,14 +366,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     Container(
                       padding: EdgeInsets.only(right: 3.0),
                       child: Text(
-                        (model.oem.isNotEmpty &&
-                                model.oem.toString().trim().toUpperCase() !=
-                                    "UNDFIND")
-                            ? model.oem.trim() +
-                                (model.workorderid.isNotEmpty
-                                    ? " (" + model.workorderid[0].wono + ")"
-                                    : "")
-                            : 'Not Filled',
+                        model.title.capitalizeFirst.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 15,
@@ -289,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ),
                     ),
                     Text(
-                      model.ticketdate.toString(),
+                      model.dateofevent.toString(),
                       maxLines: 1,
                       style:
                           const TextStyle(fontSize: 13, color: Colors.black54),

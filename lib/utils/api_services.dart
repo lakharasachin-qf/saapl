@@ -73,6 +73,8 @@ class APIService {
     };
 
     final response = await http.post(Uri.parse(api_login), body: map);
+    //print(response.statusCode);
+    //print(response.body);
     if (response.statusCode == 200 || response.statusCode == 400) {
       print(response.body);
       return LoginResponseModel.fromJson(json.decode(response.body));

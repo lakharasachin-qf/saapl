@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:saapl/models/intent_helper.dart';
+import 'package:saapl/pages/dashboard.dart';
 import 'package:saapl/utils/api_services.dart';
 import 'package:saapl/utils/screen_loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -227,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            const HomeScreen(),
+                                            const DashboardScreen(),
                                       ),
                                       (route) => false,
                                     );

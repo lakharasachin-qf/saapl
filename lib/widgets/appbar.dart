@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geocoding/geocoding.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:marquee/marquee.dart';
 import 'package:saapl/models/login_model.dart';
 import 'package:saapl/pages/add_qwt_screen.dart';
 import 'package:saapl/pages/login_screen.dart';
@@ -46,6 +47,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   String outIcon = "assets/out_icon.png";
   String currentIconAsset = "";
   String flagSubmittingToApi = "N";
+  bool isLoading = false;
 
   int daysBetween(DateTime from, DateTime to) {
     from = DateTime(from.year, from.month, from.day);
@@ -127,44 +129,41 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     initSharedPref();
     return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        color: Colors.white,
+      ),
       elevation: 3,
       shadowColor: shadowColor,
       backgroundColor: primaryColor,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Text(
-                "Work Order",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: "proxi",
-                  color: Colors.white,
-                ),
-              ),
-            ],
+      title: Container(
+        height: 30,
+        child: Marquee(
+          text: 'Work Order ${userName.trim()}                 ',
+          scrollAxis: Axis.horizontal,
+          style: TextStyle(
+            fontSize: 18,
+            fontFamily: "proxi",
+            color: Colors.white,
           ),
-        ],
+          velocity: 50.0,
+          pauseAfterRound: Duration(seconds: 1),
+          accelerationDuration: Duration(seconds: 1),
+          accelerationCurve: Curves.linear,
+          decelerationDuration: Duration(milliseconds: 500),
+          decelerationCurve: Curves.easeOut,
+        ),
       ),
       actions: [
-        Container(
-          alignment: Alignment.center,
-          margin: const EdgeInsets.only(right: 20),
-          child: Text(
-            userName.trim(),
-            style: TextStyle(
-              fontSize: 18,
-              fontFamily: "proxi",
-              color: Colors.white,
-            ),
-          ),
-        ),
         (currentIconAsset == "")
             ? Container()
             : InkWell(
                 onTap: () {
-                  attendanceApi();
+                  attendanceApiWithoutLocation();
+                  // attendanceApi();
                 },
                 child: Container(
                     alignment: Alignment.center,
@@ -195,17 +194,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
           ),
         ),
-        InkWell(
-          onTap: () {
-            logout();
-          },
-          child: Container(
-              margin: const EdgeInsets.only(right: 10),
-              child: Icon(
-                Icons.logout,
-                color: Colors.white,
-              )),
-        )
+        // InkWell(
+        //   onTap: () {
+        //     logout();
+        //   },
+        //   child: Container(
+        //       margin: const EdgeInsets.only(right: 10),
+        //       child: Icon(
+        //         Icons.logout,
+        //         color: Colors.white,
+        //       )),
+        // )
       ],
     );
   }
@@ -224,6 +223,41 @@ class _CustomAppBarState extends State<CustomAppBar> {
   //     print("AfterChange " + flagSubmittingToApi);
   //   });
   // }
+
+  attendanceApiWithoutLocation() async {
+    pref = await SharedPreferences.getInstance();
+    print("attendanceApi:" + flagSubmittingToApi.toString());
+
+    widget.callback("apiStart");
+
+    Map<String, dynamic> map = {
+      'empId': empId.toString(),
+      'inout': flagSubmittingToApi,
+      'date': pref.getString('entryDate'),
+      'location': '',
+    };
+    print(map);
+
+    final response = await http.post(Uri.parse(api_in_out_data), body: map);
+    if (response.statusCode == 200) {
+      widget.callback("apiEnd");
+      var resBody = json.decode(response.body);
+      await pref.remove("location");
+      var now = DateTime.now();
+      var formatter = DateFormat('yyyy-MM-dd');
+      String formattedDate = formatter.format(now);
+
+      await pref.setString("entryDate", formattedDate);
+      await pref.setString("isInOut", flagSubmittingToApi);
+      if (flagSubmittingToApi == "O") {}
+      _showToast("Attendance added");
+      print(resBody);
+    } else {
+      widget.callback("apiEnd");
+      await pref.remove("location");
+      print("Error");
+    }
+  }
 
   attendanceApi() async {
     pref = await SharedPreferences.getInstance();
@@ -259,78 +293,63 @@ class _CustomAppBarState extends State<CustomAppBar> {
         print("Error");
       }
     } else {
-      eventToGetLocation();
+      // eventToGetLocation();
     }
   }
 
   String location = 'Null, Press Button';
   String Address = 'search';
 
-  Future<Position> _getGeoLocationPosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Future<Position> _getGeoLocationPosition() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
+  //     await Geolocator.openLocationSettings();
+  //     return Future.error('Location services are disabled.');
+  //   }
 
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       return Future.error('Location permissions are denied');
+  //     }
+  //   }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
+  //   if (permission == LocationPermission.deniedForever) {
 
-        return Future.error('Location permissions are denied');
-      }
-    }
+  //     return Future.error(
+  //         'Location permissions are permanently denied, we cannot request permissions.');
+  //   }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
+  //   return await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  // }
 
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
+  // Future<void> GetAddressFromLatLong(Position position) async {
+  //   List<Placemark> placemarks =
+  //       await placemarkFromCoordinates(position.latitude, position.longitude);
+  //   print(placemarks);
+  //   Placemark place = placemarks[0];
+  //   Address =
+  //       '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+  //   pref = await SharedPreferences.getInstance();
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
+  //   await pref.setString("location", Address);
 
-  Future<void> GetAddressFromLatLong(Position position) async {
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    print(placemarks);
-    Placemark place = placemarks[0];
-    Address =
-        '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
-    pref = await SharedPreferences.getInstance();
+  //   print("Address = " + Address);
+  //   attendanceApi();
+  // }
 
-    await pref.setString("location", Address);
+  // eventToGetLocation() async {
+  //   _showToast("fetching location...");
 
-    print("Address = " + Address);
-    attendanceApi();
-  }
-
-  eventToGetLocation() async {
-    _showToast("fetching location...");
-
-    Position position = await _getGeoLocationPosition();
-    location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
-   // print("Location = " + location);
-    GetAddressFromLatLong(position);
-  }
+  //   Position position = await _getGeoLocationPosition();
+  //   location = 'Lat: ${position.latitude} , Long: ${position.longitude}';
+  //   GetAddressFromLatLong(position);
+  // }
 
   late FToast fToast;
 

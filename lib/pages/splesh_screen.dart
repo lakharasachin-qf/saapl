@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:saapl/pages/dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
@@ -30,8 +31,12 @@ class _SpleshScreenState extends State<SplashScreen> {
         () => {
               if (pref.getBool("isLogin") == true)
                 {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()))
+                  // Navigator.pushReplacement(context,
+                  //     MaterialPageRoute(builder: (context) => HomeScreen()))
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DashboardScreen()))
                 }
               else
                 {
@@ -48,7 +53,10 @@ class _SpleshScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-          child: Image.asset("assets/logo.png",height: 100,)),
+          child: Image.asset(
+        "assets/logo.png",
+        height: 100,
+      )),
     );
   }
 }
